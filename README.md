@@ -61,6 +61,37 @@ When the deployment is completely finished (it may take 30 minutes to complete),
 ```
 az group deployment show -n azuredeploy -g <resource group name> -o json | jq -r .properties.outputs
 ```
+Example:
+```JSON
+{
+  "infra Storage Account Name": {
+    "type": "String",
+    "value": "infraivbfv34kcpy62"
+  },
+  "node Data Storage Account Name": {
+    "type": "String",
+    "value": "nodedata5kd5lb5d4rtlo"
+  },
+  "node OS Storage Account Name": {
+    "type": "String",
+    "value": "nodeos6z2i75g5slhmy"
+  },
+  "openshift Console Url": {
+    "type": "String",
+    "value": "https://masterdnsxbbi4wlpglono.westeurope.cloudapp.azure.com:8443/console"
+  },
+  "openshift Infra Load Balancer FQDN": {
+    "type": "String",
+    "value": "infradnsivbfv34kcpy62.westeurope.cloudapp.azure.com"
+  },
+  "openshift Master SSH": {
+    "type": "String",
+    "value": "ssh azureuser@masterdnsxbbi4wlpglono.westeurope.cloudapp.azure.com -p 2200"
+  }
+}
+```
+
+
 Two interesting outputs are the OpenShift Console URL, and the OpenShift Master SSH command. When connecting with SSH, don't forget to use the SSH key from before:
 ```
 ssh -i <SSH key file> <username>@<master FQDN>
