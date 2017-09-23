@@ -15,7 +15,7 @@
 #   az account set --subscription <subscription name>
 
 #### Edit variables here
-DEMO_NAME=demo-3
+DEMO_NAME=demo-openshift-1
 LOCATION=westeurope
 SSH_KEY_FILE=~/.ssh/demo_id_rsa
 USER_NAME=azureuser
@@ -45,18 +45,17 @@ USER_PASSWORD=$USER_PASSWORD
 EOF
 
 # Subscription id
-echo ---Subscription ID | tee -a $LOG_FILE
+echo ---Subscription ID
 ARM_SUBSCRIPTION_ID=$(az account show -o json | jq -r .id)
 echo ARM_SUBSCRIPTION_ID=$ARM_SUBSCRIPTION_ID | tee -a $LOG_FILE
 
 # Resource group
-echo ---Resource group | tee -a $LOG_FILE
-RG_JSON=$(az group create -n $RG_NAME -l $LOCATION -o json)
-RG_ID=$(echo $RG_JSON | jq -r .id)
+echo ---Resource group
+RG_ID=$(az group create -n $RG_NAME -l $LOCATION -o json | jq -r .id)
 echo RG_ID=$RG_ID | tee -a $LOG_FILE
 
 # Key Vault and SSH Key
-echo ---Key vault | tee -a $LOG_FILE
+echo ---Key vault
 az keyvault create -n $KV_NAME -g $RG_NAME -l $LOCATION --enabled-for-template-deployment true | tee -a $LOG_FILE
 echo ---Secret | tee -a $LOG_FILE
 az keyvault secret set --vault-name $KV_NAME -n $SSH_SECRET --file $SSH_KEY_FILE | tee -a $LOG_FILE
@@ -88,7 +87,7 @@ EOF
 # https://raw.githubusercontent.com/Microsoft/openshift-origin/master/azuredeploy.parameters.json
 # https://raw.githubusercontent.com/Microsoft/openshift-origin/master/azuredeploy.parameters.sample.local.json
 
-echo ---Parameters file | tee -a $LOG_FILE
+echo ---Parameters file
 
 ### Edit parameters here
 cat > $PARAMETERS_FILE <<EOF
@@ -159,7 +158,8 @@ EOF
 
 echo ---Deployment | tee -a $LOG_FILE
 
-az group deployment create -g $RG_NAME --template-uri https://raw.githubusercontent.com/Microsoft/openshift-origin/master/azuredeploy.json --parameters @azuredeploy.parameters.demo.json -o json | tee -a $LOG_FILE
+az group deployment create -g $RG_NAME --template-uri https://raw.githubusercontent.com/Microsoft/openshift-origin/master/azuredeploy.json --parameters @$PARAMETERS_FILE --no-wait
+
 
 # The end
 tee -a $LOG_FILE <<EOF
