@@ -13,12 +13,12 @@ Then you need an SSH Key. Remember that the private key will be uploaded some of
 ssh-keygen -N "" -f <ssh key file>
 ```
 
-Install [jq](https://stedolan.github.io/jq/):
+You also need [jq](https://stedolan.github.io/jq/):
 ```
 sudo apt install jq
 ```
 
-install [Azure CLI 2.0](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest), login and select the subscription:
+And if not already done, install [Azure CLI 2.0](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest "Install Azure CLI 2.0"), login and select the subscription:
 ```
 az login
 az account set --subscription <subscription name>
@@ -37,7 +37,7 @@ Variables:
 - USER_NAME: a user name for the VMs and for OpenShift
 - USER_PASSWORD: the user password for OpenShift
 
-Parameters for the JSON parameters file: the most likely to be changed are the numbers of VM
+Parameters for the JSON parameters file: the most likely to be changed are the numbers of VM.
 - masterInstanceCount: 3 or 5
 - infraInstanceCount: 2 or 3
 - nodeInstanceCount: 1 to 30
