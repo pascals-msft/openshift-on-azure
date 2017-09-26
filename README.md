@@ -51,18 +51,38 @@ Just run `./deploy.sh` to run the deployment. The script will automatically:
 - generate a parameters file for the ARM template,
 - initiate the deployment.
 
+All will be logged in a .log file with the demo name as its base name.
+
 Once the script is finished, the deployment should be in progress. You can track its progress with this command:
 ```
 az group deployment list -g <resource group name>
 ```
 Where the resource group name is the same as the demo name.
 
+Example:
+```
+$ az group deployment list -g demo-openshift-1
+Name                 Timestamp                         State
+-------------------  --------------------------------  ---------
+masterVmDeployment0  2017-09-26T09:15:41.642989+00:00  Succeeded
+masterVmDeployment2  2017-09-26T09:15:44.095331+00:00  Succeeded
+masterVmDeployment1  2017-09-26T09:15:44.835344+00:00  Succeeded
+infraVmDeployment1   2017-09-26T09:15:47.362570+00:00  Succeeded
+infraVmDeployment0   2017-09-26T09:15:53.266631+00:00  Succeeded
+nodeVmDeployment0    2017-09-26T09:16:09.463176+00:00  Succeeded
+nodeVmDeployment1    2017-09-26T09:16:11.039410+00:00  Succeeded
+nodeVmDeployment2    2017-09-26T09:16:11.680752+00:00  Succeeded
+OpenShiftDeployment  2017-09-26T09:55:35.824503+00:00  Succeeded
+azuredeploy          2017-09-26T09:55:51.122690+00:00  Succeeded
+```
+
 When the deployment is completely finished (it may take 30 minutes to complete), you can get the deployment outputs with this command:
 ```
 az group deployment show -n azuredeploy -g <resource group name> -o json | jq -r .properties.outputs
 ```
 Example:
-```JSON
+```
+$ az group deployment show -n azuredeploy -g demo-openshift-1 -o json | jq -r .properties.outputs
 {
   "infra Storage Account Name": {
     "type": "String",
@@ -91,10 +111,7 @@ Example:
 }
 ```
 
-
-Two interesting outputs are the OpenShift Console URL, and the OpenShift Master SSH command. When connecting with SSH, don't forget to use the SSH key from before:
+Two interesting outputs are the OpenShift Console URL, and the OpenShift Master SSH command. When connecting with SSH, don't forget to specify the SSH key from before, with the `-i` parameter:
 ```
-ssh -i <SSH key file> <username>@<master FQDN>
+ssh -i <SSH key file> <username>@<master FQDN> -p 2200
 ```
-
-
