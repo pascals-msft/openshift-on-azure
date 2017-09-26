@@ -147,7 +147,7 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": "$SP_PASSWORD"
 		},
 		"defaultSubDomainType": {
-			"value": "xipio"
+			"value": "nipio"
 		},
 		"defaultSubDomain": {
 			"value": "xxxx"
