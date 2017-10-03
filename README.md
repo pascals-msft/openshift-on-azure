@@ -6,16 +6,11 @@ The ARM templates for deploying OpenShift Origin and OpenShift Container Platfor
 
 ## Prerequisites
 
-You will need a Linux system (tested on Ubuntu 16.04 LTS) or Bash on [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/about "Windows Subsystem for Linux Documentation").
+You will need a Linux system (tested on Ubuntu 16.04 LTS) or Bash on [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/about "Windows Subsystem for Linux Documentation"). You also need [Python](https://www.python.org/), at least 2.6, but it should already be in your system.
 
 Then you need an SSH Key. Remember that the private key will be uploaded some of the VMs, so don't use your own key. You can generate a new key with:
 ```
 ssh-keygen -N "" -f <ssh key file>
-```
-
-You also need [jq](https://stedolan.github.io/jq/):
-```
-sudo apt install jq
 ```
 
 And if not already done, install [Azure CLI 2.0](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest "Install Azure CLI 2.0"), login and select the subscription:

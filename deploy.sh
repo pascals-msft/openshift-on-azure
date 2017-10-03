@@ -1,13 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Source: https://aka.ms/openshift
 # Demo: OpenShift Origin
 #
 # Prerequisites:
+# python must be present
 # generate a SSH key
 #   ssh-keygen -N "" -f <ssh key file>
-# install jq:
-#   sudo apt install jq
 # install Azure CLI 2.0:
 #   https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest
 # login and select the subscription:
@@ -15,7 +14,7 @@
 #   az account set --subscription <subscription name>
 
 #### Edit variables here
-DEMO_NAME=demo-openshift-1
+DEMO_NAME=demo-openshift-0
 LOCATION=westeurope
 SSH_KEY_FILE=~/.ssh/demo_id_rsa
 USER_NAME=azureuser
@@ -44,14 +43,9 @@ USER_NAME=$USER_NAME
 USER_PASSWORD=$USER_PASSWORD
 EOF
 
-# Subscription id
-echo ---Subscription ID
-ARM_SUBSCRIPTION_ID=$(az account show -o json | jq -r .id)
-echo ARM_SUBSCRIPTION_ID=$ARM_SUBSCRIPTION_ID | tee -a $LOG_FILE
-
 # Resource group
 echo ---Resource group
-RG_ID=$(az group create -n $RG_NAME -l $LOCATION -o json | jq -r .id)
+RG_ID=$(az group create -n $RG_NAME -l $LOCATION --query [id] -o tsv)
 echo RG_ID=$RG_ID | tee -a $LOG_FILE
 
 # Key Vault and SSH Key
@@ -62,7 +56,7 @@ az keyvault secret set --vault-name $KV_NAME -n $SSH_SECRET --file $SSH_KEY_FILE
 
 # Service principal
 echo ---Service Principal | tee -a $LOG_FILE
-ARM_SERVICE_PRINCIPAL=$(az ad sp create-for-rbac --role Contributor --scopes $RG_ID -o json)
+SP_JSON=$(az ad sp create-for-rbac --role Contributor --scopes $RG_ID -o json)
 
 # Example:
 # {
@@ -73,11 +67,11 @@ ARM_SERVICE_PRINCIPAL=$(az ad sp create-for-rbac --role Contributor --scopes $RG
 #   "tenant": "72f988bf-86f1-41af-91ab-2d7cd011db47"
 # }
 
-SP_APP_ID=$(echo $ARM_SERVICE_PRINCIPAL | jq -r .appId)
-SP_PASSWORD=$(echo $ARM_SERVICE_PRINCIPAL | jq -r .password)
+SP_APP_ID=$(python ./json_value.py "$SP_JSON" "appId")
+SP_PASSWORD=$(python ./json_value.py "$SP_JSON" "password")
 
 tee -a $LOG_FILE <<EOF
-ARM_SERVICE_PRINCIPAL=$ARM_SERVICE_PRINCIPAL
+SP_JSON=$SP_JSON
 SP_APP_ID=$SP_APP_ID
 SP_PASSWORD=$SP_PASSWORD
 EOF
@@ -160,7 +154,6 @@ echo ---Deployment | tee -a $LOG_FILE
 
 az group deployment create -g $RG_NAME --template-uri https://raw.githubusercontent.com/Microsoft/openshift-origin/master/azuredeploy.json --parameters @$PARAMETERS_FILE --no-wait
 
-
 # The end
 tee -a $LOG_FILE <<EOF
 ----------
@@ -168,7 +161,7 @@ To watch the deployment:
 $ watch az group deployment list -g $RG_NAME
 
 Once the deployment is completed, get the outputs like this:
-$ az group deployment show -n azuredeploy -g $RG_NAME -o json | jq -r .properties.outputs
+$ az group deployment show -n azuredeploy -g $RG_NAME --query [properties.outputs] -o json
 
 If you need to cleanup the whole demo,
 delete the Resource group and the service principal:
