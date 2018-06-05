@@ -6,7 +6,7 @@ The ARM templates for deploying OpenShift Origin and OpenShift Container Platfor
 
 ## Prerequisites
 
-You will need a Linux system (tested on Ubuntu 16.04 LTS) or Bash on [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/about "Windows Subsystem for Linux Documentation"). You also need [Python](https://www.python.org/), at least 2.6, but it should already be in your system.
+You will need a Linux system (tested on Ubuntu 16.04 LTS) or Bash on [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/about "Windows Subsystem for Linux Documentation"), or a Mac. You also need [Python](https://www.python.org/), at least 2.6, but it should already be in your system.
 
 Then you need an SSH Key. Remember that the private key will be uploaded some of the VMs, so don't use your own key. You can generate a new key with:
 ```
@@ -32,9 +32,10 @@ Variables:
 - USER_NAME: a user name for the VMs and for OpenShift
 - USER_PASSWORD: the user password for OpenShift
 
-Parameters for the JSON parameters file: the most likely to be changed are the numbers of VM.
-- masterInstanceCount: 3 or 5
-- infraInstanceCount: 2 or 3
+Parameters for the JSON parameters file: the most likely to be changed are VM sizes and the numbers of VM.
+- masterVmSize, nodeVmSize, infraVmSize
+- masterInstanceCount: 1, 3 or 5
+- infraInstanceCount: 1, 2 or 3
 - nodeInstanceCount: 1 to 30
 
 ## Deployment
