@@ -17,8 +17,8 @@
 DEMO_NAME=demo-openshift-0
 LOCATION=francecentral
 SSH_KEY_FILE=~/.ssh/demo_id_rsa
-USER_NAME=azureuser
-USER_PASSWORD=OpenShift..1
+USER_NAME=openshift
+USER_PASSWORD=redhat123
 
 # Other variables
 LOG_FILE=$DEMO_NAME.log
@@ -90,16 +90,16 @@ cat > $PARAMETERS_FILE <<EOF
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"_artifactsLocation": {
-			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master/"
+			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/release-3.9/"
 		},
 		"masterVmSize": {
-			"value": "Standard_D4s_v3"
+			"value": "Standard_DS2_v2"
 		},
 		"infraVmSize": {
-			"value": "Standard_D4s_v3"
+			"value": "Standard_DS2_v2"
 		},
 		"nodeVmSize": {
-			"value": "Standard_D4s_v3"
+			"value": "Standard_DS2_v2"
 		},
 		"storageKind": {
 			"value": "managed"
@@ -117,7 +117,7 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": 2
 		},
 		"dataDiskSize": {
-			"value": 128
+			"value": 32
 		},
 		"adminUsername": {
 			"value": "$USER_NAME"
@@ -129,7 +129,7 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": "true"
 		},
 		"enableLogging": {
-			"value": "false"
+			"value": "true"
 		},
 		"sshPublicKey": {
 			"value": "$SSH_PUBLIC_KEY"
