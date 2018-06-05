@@ -73,37 +73,27 @@ azuredeploy          2017-09-26T09:55:51.122690+00:00  Succeeded
 
 When the deployment is completely finished (it may take 30 minutes to complete), you can get the deployment outputs with this command:
 ```
-az group deployment show -n azuredeploy -g <resource group name> -o json | jq -r .properties.outputs
+az group deployment show -n azuredeploy -g <resource group name> --query [properties.outputs] -o json
 ```
 Example:
 ```
-$ az group deployment show -n azuredeploy -g demo-openshift-1 -o json | jq -r .properties.outputs
-{
-  "infra Storage Account Name": {
-    "type": "String",
-    "value": "infraivbfv34kcpy62"
-  },
-  "node Data Storage Account Name": {
-    "type": "String",
-    "value": "nodedata5kd5lb5d4rtlo"
-  },
-  "node OS Storage Account Name": {
-    "type": "String",
-    "value": "nodeos6z2i75g5slhmy"
-  },
-  "openshift Console Url": {
-    "type": "String",
-    "value": "https://masterdnsxbbi4wlpglono.westeurope.cloudapp.azure.com:8443/console"
-  },
-  "openshift Infra Load Balancer FQDN": {
-    "type": "String",
-    "value": "infradnsivbfv34kcpy62.westeurope.cloudapp.azure.com"
-  },
-  "openshift Master SSH": {
-    "type": "String",
-    "value": "ssh azureuser@masterdnsxbbi4wlpglono.westeurope.cloudapp.azure.com -p 2200"
+$ az group deployment show -n azuredeploy -g demo-openshift-1 --query [properties.outputs] -o json
+[
+  {
+    "openshift Console Url": {
+      "type": "String",
+      "value": "https://masterdns876wuuscnactk.francecentral.cloudapp.azure.com/console"
+    },
+    "openshift Infra Load Balancer FQDN": {
+      "type": "String",
+      "value": "infradnshnrajkqulhg32.francecentral.cloudapp.azure.com"
+    },
+    "openshift Master SSH": {
+      "type": "String",
+      "value": "ssh -p 2200 openshift@masterdns876wuuscnactk.francecentral.cloudapp.azure.com"
+    }
   }
-}
+]
 ```
 
 Two interesting outputs are the OpenShift Console URL, and the OpenShift Master SSH command. When connecting with SSH, don't forget to specify the SSH key from before, with the `-i` parameter:
