@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Source: https://aka.ms/openshift
+# Source: http://aka.ms/OpenShift
 # Demo: OpenShift Origin
 #
 # Prerequisites:
@@ -15,7 +15,7 @@
 
 #### Edit variables here
 DEMO_NAME=demo-openshift-0
-LOCATION=westeurope
+LOCATION=francecentral
 SSH_KEY_FILE=~/.ssh/demo_id_rsa
 USER_NAME=azureuser
 USER_PASSWORD=OpenShift..1
@@ -93,13 +93,16 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master/"
 		},
 		"masterVmSize": {
-			"value": "Standard_DS2_v2"
+			"value": "Standard_D4s_v3"
 		},
 		"infraVmSize": {
-			"value": "Standard_DS2_v2"
+			"value": "Standard_D4s_v3"
 		},
 		"nodeVmSize": {
-			"value": "Standard_DS2_v2"
+			"value": "Standard_D4s_v3"
+		},
+		"storageKind": {
+			"value": "managed"
 		},
 		"openshiftClusterPrefix": {
 			"value": "$DEMO_NAME"
@@ -108,10 +111,10 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": 3
 		},
 		"infraInstanceCount": {
-			"value": 2
+			"value": 3
 		},
 		"nodeInstanceCount": {
-			"value": 3
+			"value": 2
 		},
 		"dataDiskSize": {
 			"value": 128
@@ -121,6 +124,12 @@ cat > $PARAMETERS_FILE <<EOF
 		},
 		"openshiftPassword": {
 			"value": "$USER_PASSWORD"
+		},
+		"enableMetrics": {
+			"value": "true"
+		},
+		"enableLogging": {
+			"value": "false"
 		},
 		"sshPublicKey": {
 			"value": "$SSH_PUBLIC_KEY"
@@ -133,6 +142,9 @@ cat > $PARAMETERS_FILE <<EOF
 		},
 		"keyVaultSecret": {
 			"value": "$SSH_SECRET"
+		},
+		"enableAzure": {
+			"value": "true"
 		},
 		"aadClientId": {
 			"value": "$SP_APP_ID"
