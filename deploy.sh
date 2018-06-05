@@ -14,7 +14,7 @@
 #   az account set --subscription <subscription name>
 
 #### Edit variables here
-DEMO_NAME=demo-openshift-0
+DEMO_NAME=demo-$RANDOM
 LOCATION=francecentral
 SSH_KEY_FILE=~/.ssh/demo_id_rsa
 USER_NAME=openshift
