@@ -6,11 +6,15 @@ The ARM templates for deploying OpenShift Origin and OpenShift Container Platfor
 
 ## Prerequisites
 
-You will need a Linux system (tested on Ubuntu 16.04 LTS) or Bash on [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/about "Windows Subsystem for Linux Documentation"), or a Mac. You also need [Python](https://www.python.org/), at least 2.6, but it should already be in your system.
+You will need a Linux system (tested on Ubuntu 16.04 LTS) or Bash on [Windows Subsystem for Linux](https://msdn.microsoft.com/en-us/commandline/wsl/about "Windows Subsystem for Linux Documentation"), or a Mac. You also need [Python](https://www.python.org/), at least 2.6, but it should already be in your system: the `which python` command should return something.
 
 Then you need an SSH Key. Remember that the private key will be uploaded some of the VMs, so don't use your own key. You can generate a new key with:
 ```
-ssh-keygen -N "" -f <ssh key file>
+ssh-keygen -N "" -f <new ssh key file>
+```
+For instance:
+```
+ssh-keygen -N "" -f ~/.ssh/demo_id_rsa
 ```
 
 And if not already done, install [Azure CLI 2.0](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest "Install Azure CLI 2.0"), login and select the subscription:
@@ -26,17 +30,17 @@ Before running the script:
 - edit the parameters in the JSON portion of the script
 
 Variables:
-- DEMO_NAME: name used for the log file, the resource group, the Key Vault and the parameters file
-- LOCATION: Azure region (full list: `az account list-locations`)
-- SSH_KEY_FILE: SSH private key file name (the one from above)
-- USER_NAME: a user name for the VMs and for OpenShift
-- USER_PASSWORD: the user password for OpenShift
+- `DEMO_NAME`: name used for the log file, the resource group, the Key Vault and the parameters file. Since the Key Vault name must be unique, the use of `$RANDOM` in this name is convenient.
+- `LOCATION`: Azure region (full list: `az account list-locations`)
+- `SSH_KEY_FILE`: SSH private key file name (the one from above)
+- `USER_NAME`: a user name for the VMs and for OpenShift
+- `USER_PASSWORD`: the user password for OpenShift
 
 Parameters for the JSON parameters file: the most likely to be changed are VM sizes and the numbers of VM.
-- masterVmSize, nodeVmSize, infraVmSize
-- masterInstanceCount: 1, 3 or 5
-- infraInstanceCount: 1, 2 or 3
-- nodeInstanceCount: 1 to 30
+- `masterVmSize`, `nodeVmSize`, `infraVmSize`: for instance, `Standard_DS2_v2`. These parameters are case sensitive.
+- `masterInstanceCount`: 1, 3 or 5
+- `infraInstanceCount`: 1, 2 or 3
+- `nodeInstanceCount`: 1 to 30
 
 ## Deployment
 
@@ -72,7 +76,7 @@ OpenShiftDeployment  2017-09-26T09:55:35.824503+00:00  Succeeded
 azuredeploy          2017-09-26T09:55:51.122690+00:00  Succeeded
 ```
 
-When the deployment is completely finished (it may take 30 minutes to complete), you can get the deployment outputs with this command:
+When the deployment is completely finished (it may take 50 minutes to complete), you can get the deployment outputs with this command:
 ```
 az group deployment show -n azuredeploy -g <resource group name> --query [properties.outputs] -o json
 ```

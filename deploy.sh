@@ -111,7 +111,7 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": 3
 		},
 		"infraInstanceCount": {
-			"value": 3
+			"value": 2
 		},
 		"nodeInstanceCount": {
 			"value": 2
