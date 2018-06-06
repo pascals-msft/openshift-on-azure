@@ -61,19 +61,18 @@ Where the resource group name is the same as the demo name.
 
 Example:
 ```
-$ az group deployment list -g demo-openshift-1
+$ az group deployment list -g demo-13673
 Name                 Timestamp                         State
 -------------------  --------------------------------  ---------
-masterVmDeployment0  2017-09-26T09:15:41.642989+00:00  Succeeded
-masterVmDeployment2  2017-09-26T09:15:44.095331+00:00  Succeeded
-masterVmDeployment1  2017-09-26T09:15:44.835344+00:00  Succeeded
-infraVmDeployment1   2017-09-26T09:15:47.362570+00:00  Succeeded
-infraVmDeployment0   2017-09-26T09:15:53.266631+00:00  Succeeded
-nodeVmDeployment0    2017-09-26T09:16:09.463176+00:00  Succeeded
-nodeVmDeployment1    2017-09-26T09:16:11.039410+00:00  Succeeded
-nodeVmDeployment2    2017-09-26T09:16:11.680752+00:00  Succeeded
-OpenShiftDeployment  2017-09-26T09:55:35.824503+00:00  Succeeded
-azuredeploy          2017-09-26T09:55:51.122690+00:00  Succeeded
+azuredeploy          2018-06-06T05:54:46.983440+00:00  Running
+masterVmDeployment2  2018-06-06T05:57:27.241508+00:00  Succeeded
+nodeVmDeployment0    2018-06-06T05:57:32.606050+00:00  Succeeded
+infraVmDeployment1   2018-06-06T05:57:37.151068+00:00  Succeeded
+nodeVmDeployment1    2018-06-06T05:57:42.147226+00:00  Succeeded
+masterVmDeployment0  2018-06-06T05:57:42.240062+00:00  Succeeded
+infraVmDeployment0   2018-06-06T05:57:42.328470+00:00  Succeeded
+masterVmDeployment1  2018-06-06T05:57:56.275798+00:00  Succeeded
+OpenShiftDeployment  2018-06-06T06:05:21.514135+00:00  Running
 ```
 
 When the deployment is completely finished (it may take 50 minutes to complete), you can get the deployment outputs with this command:
@@ -82,20 +81,20 @@ az group deployment show -n azuredeploy -g <resource group name> --query [proper
 ```
 Example:
 ```
-$ az group deployment show -n azuredeploy -g demo-openshift-1 --query [properties.outputs] -o json
+$ az group deployment show -n azuredeploy -g demo-13673 --query [properties.outputs] -o json
 [
   {
     "openshift Console Url": {
       "type": "String",
-      "value": "https://masterdns876wuuscnactk.francecentral.cloudapp.azure.com/console"
+      "value": "https://masterdnsoyhfumycvo434.francecentral.cloudapp.azure.com/console"
     },
     "openshift Infra Load Balancer FQDN": {
       "type": "String",
-      "value": "infradnshnrajkqulhg32.francecentral.cloudapp.azure.com"
+      "value": "infradnsfh6ox5zd36h3m.francecentral.cloudapp.azure.com"
     },
     "openshift Master SSH": {
       "type": "String",
-      "value": "ssh -p 2200 openshift@masterdns876wuuscnactk.francecentral.cloudapp.azure.com"
+      "value": "ssh -p 2200 openshift@masterdnsoyhfumycvo434.francecentral.cloudapp.azure.com"
     }
   }
 ]
@@ -105,3 +104,35 @@ Two interesting outputs are the OpenShift Console URL, and the OpenShift Master 
 ```
 ssh -i <SSH key file> <username>@<master FQDN> -p 2200
 ```
+For instance:
+```
+$ ssh -i ~/.ssh/demo_id_rsa -p 2200 openshift@masterdnsoyhfumycvo434.francecentral.cloudapp.azure.com 
+The authenticity of host '[masterdnsoyhfumycvo434.francecentral.cloudapp.azure.com]:2200 ([40.89.128.111]:2200)' can't be established.
+ECDSA key fingerprint is SHA256:021MalmaKLFaPZfYJKSEhxKKLgLVbZJpcSLC1vJ6b5I.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '[masterdnsoyhfumycvo434.francecentral.cloudapp.azure.com]:2200,[40.89.128.111]:2200' (ECDSA) to the list of known hosts.
+Last login: Wed Jun  6 07:01:16 2018 from demo-13673-master-0
+[openshift@demo-13673-master-0 ~]$ 
+[openshift@demo-13673-master-0 ~]$ oc status
+In project default on server https://masterdnsoyhfumycvo434.francecentral.cloudapp.azure.com
+
+https://docker-registry-default.40.89.131.11.nip.io (passthrough) (svc/docker-registry)
+  dc/docker-registry deploys docker.io/openshift/origin-docker-registry:v3.9.0 
+    deployment #2 deployed 34 minutes ago - 1 pod
+    deployment #1 deployed 37 minutes ago
+
+svc/kubernetes - 172.30.0.1 ports 443, 53->8053, 53->8053
+
+https://registry-console-default.40.89.131.11.nip.io (passthrough) (svc/registry-console)
+  dc/registry-console deploys docker.io/cockpit/kubernetes:latest 
+    deployment #1 deployed 36 minutes ago - 1 pod
+
+svc/router - 172.30.109.164 ports 80, 443, 1936
+  dc/router deploys docker.io/openshift/origin-haproxy-router:v3.9.0 
+    deployment #1 deployed 38 minutes ago - 2 pods
+
+View details with 'oc describe <resource>/<name>' or list everything with 'oc get all'.
+[openshift@demo-13673-master-0 ~]$
+```
+
+Finaly, the log file contains the commands you can use to completely delete the demo, by deleting the resource group and the service principal.
