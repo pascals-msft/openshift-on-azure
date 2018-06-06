@@ -102,7 +102,7 @@ $ az group deployment show -n azuredeploy -g demo-13673 --query [properties.outp
 
 Two interesting outputs are the OpenShift Console URL, and the OpenShift Master SSH command. When connecting with SSH, don't forget to specify the SSH key from before, with the `-i` parameter:
 ```
-ssh -i <SSH key file> <username>@<master FQDN> -p 2200
+ssh -i <SSH key file> -p 2200 <username>@<master FQDN>
 ```
 For instance:
 ```
