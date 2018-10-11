@@ -13,16 +13,29 @@
 #   az login
 #   az account set --subscription <subscription name>
 
+set -x
+set -e
+
 #### Edit variables here
-DEMO_NAME=demo-$RANDOM
+DEMO_NAME=demo-openshift-$RANDOM
 LOCATION=francecentral
-SSH_KEY_FILE=~/.ssh/demo_id_rsa
+# SSH_KEY_FILE=~/.ssh/demo_id_rsa
+SSH_KEY_FILE=~/.ssh/${DEMO_NAME}_rsa
 USER_NAME=openshift
 USER_PASSWORD=redhat123
 
-# Other variables
+# Log file
 LOG_FILE=$DEMO_NAME.log
 echo $(date) - $0 > $LOG_FILE
+
+# SSH key
+if [ ! -f $SSH_KEY_FILE ]; then
+	echo ---SSH key | tee -a $LOG_FILE
+	echo "Creating new SSH key: $SSH_KEY_FILE" | tee -a $LOG_FILE
+	ssh-keygen -N "" -f $SSH_KEY_FILE | tee -a $LOG_FILE
+fi
+
+# Other variables
 RG_NAME=$DEMO_NAME
 KV_NAME=${DEMO_NAME}-kv
 SSH_SECRET=demosshkey
@@ -44,34 +57,27 @@ USER_PASSWORD=$USER_PASSWORD
 EOF
 
 # Resource group
-echo ---Resource group
+echo ---Resource group | tee -a $LOG_FILE
 RG_ID=$(az group create -n $RG_NAME -l $LOCATION --query [id] -o tsv)
 echo RG_ID=$RG_ID | tee -a $LOG_FILE
 
 # Key Vault and SSH Key
-echo ---Key vault
+echo ---Key vault | tee -a $LOG_FILE
 az keyvault create -n $KV_NAME -g $RG_NAME -l $LOCATION --enabled-for-template-deployment true | tee -a $LOG_FILE
 echo ---Secret | tee -a $LOG_FILE
 az keyvault secret set --vault-name $KV_NAME -n $SSH_SECRET --file $SSH_KEY_FILE | tee -a $LOG_FILE
 
 # Service principal
 echo ---Service Principal | tee -a $LOG_FILE
-SP_JSON=$(az ad sp create-for-rbac --role Contributor --scopes $RG_ID -o json)
-
+SP_TSV=$(az ad sp create-for-rbac --role Contributor --scopes $RG_ID -o tsv)
 # Example:
-# {
-#   "appId": "4f6525e2-9bee-4de0-90e2-be5121d5e060",
-#   "displayName": "azure-cli-2017-04-24-16-47-01",
-#   "name": "http://azure-cli-2017-04-24-16-47-01",
-#   "password": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-#   "tenant": "72f988bf-86f1-41af-91ab-2d7cd011db47"
-# }
-
-SP_APP_ID=$(python ./json_value.py "$SP_JSON" "appId")
-SP_PASSWORD=$(python ./json_value.py "$SP_JSON" "password")
+# c966217a-a002-4a4b-8fc7-040c574abe44	azure-cli-2018-10-11-16-30-01	http://azure-cli-2018-10-11-16-30-01	3e3bb517-79e4-4d55-870d-6b52a73f93b5	72f988bf-86f1-41af-91ab-2d7cd011db47
+# fields: AppId, DisplayName, Name, Password, Tenant
+SP_APP_ID=$(echo $SP_TSV | cut -d ' ' -f 1)
+SP_PASSWORD=$(echo $SP_TSV | cut -d ' '  -f 4)
 
 tee -a $LOG_FILE <<EOF
-SP_JSON=$SP_JSON
+SP_TSV=$SP_TSV
 SP_APP_ID=$SP_APP_ID
 SP_PASSWORD=$SP_PASSWORD
 EOF
@@ -111,13 +117,13 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": 3
 		},
 		"infraInstanceCount": {
-			"value": 2
+			"value": 3
 		},
 		"nodeInstanceCount": {
-			"value": 2
+			"value": 3
 		},
 		"dataDiskSize": {
-			"value": 32
+			"value": 128
 		},
 		"adminUsername": {
 			"value": "$USER_NAME"
