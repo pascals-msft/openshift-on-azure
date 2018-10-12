@@ -4,17 +4,14 @@
 # Demo: OpenShift Origin
 #
 # Prerequisites:
-# python must be present
-# generate a SSH key
-#   ssh-keygen -N "" -f <ssh key file>
 # install Azure CLI 2.0:
 #   https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest
 # login and select the subscription:
 #   az login
 #   az account set --subscription <subscription name>
 
-set -x
-set -e
+#set -x
+#set -e
 
 #### Edit variables here
 DEMO_NAME=demo-openshift-$RANDOM
@@ -43,6 +40,7 @@ SSH_PUBLIC_KEY=$(ssh-keygen -y -f $SSH_KEY_FILE)
 PARAMETERS_FILE=azuredeploy.parameters.${DEMO_NAME}.json
 
 tee -a $LOG_FILE <<EOF
+---Variables
 DEMO_NAME=$DEMO_NAME
 LOG_FILE=$LOG_FILE
 LOCATION=$LOCATION
@@ -73,12 +71,12 @@ SP_TSV=$(az ad sp create-for-rbac --role Contributor --scopes $RG_ID -o tsv)
 # Example:
 # c966217a-a002-4a4b-8fc7-040c574abe44	azure-cli-2018-10-11-16-30-01	http://azure-cli-2018-10-11-16-30-01	3e3bb517-79e4-4d55-870d-6b52a73f93b5	72f988bf-86f1-41af-91ab-2d7cd011db47
 # fields: AppId, DisplayName, Name, Password, Tenant
-SP_APP_ID=$(echo $SP_TSV | cut -d ' ' -f 1)
+SP_APPID=$(echo $SP_TSV | cut -d ' ' -f 1)
 SP_PASSWORD=$(echo $SP_TSV | cut -d ' '  -f 4)
 
 tee -a $LOG_FILE <<EOF
 SP_TSV=$SP_TSV
-SP_APP_ID=$SP_APP_ID
+SP_APPID=$SP_APPID
 SP_PASSWORD=$SP_PASSWORD
 EOF
 
@@ -153,7 +151,7 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": "true"
 		},
 		"aadClientId": {
-			"value": "$SP_APP_ID"
+			"value": "$SP_APPID"
 		},
 		"aadClientSecret": {
 			"value": "$SP_PASSWORD"
@@ -174,15 +172,14 @@ az group deployment create -g $RG_NAME --template-uri https://raw.githubusercont
 
 # The end
 tee -a $LOG_FILE <<EOF
-----------
+------------------------------------------------------------
 To watch the deployment:
 $ watch az group deployment list -g $RG_NAME
 
 Once the deployment is completed, get the outputs like this:
 $ az group deployment show -n azuredeploy -g $RG_NAME --query [properties.outputs] -o json
 
-If you need to cleanup the whole demo,
-delete the Resource group and the service principal:
+If you need to cleanup the whole demo, delete the resource group and the service principal:
 $ az group delete -n $RG_NAME --no-wait -y
-$ az ad app delete --id $SP_APP_ID
+$ az ad app delete --id $SP_APPID
 EOF
