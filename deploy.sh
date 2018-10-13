@@ -71,13 +71,18 @@ SP_TSV=$(az ad sp create-for-rbac --role Contributor --scopes $RG_ID -o tsv)
 # Example:
 # c966217a-a002-4a4b-8fc7-040c574abe44	azure-cli-2018-10-11-16-30-01	http://azure-cli-2018-10-11-16-30-01	3e3bb517-79e4-4d55-870d-6b52a73f93b5	72f988bf-86f1-41af-91ab-2d7cd011db47
 # fields: AppId, DisplayName, Name, Password, Tenant
-SP_APPID=$(echo $SP_TSV | cut -d ' ' -f 1)
+SP_APP_ID=$(echo $SP_TSV | cut -d ' ' -f 1)
+SP_DISPLAY_NAME=$(echo $SP_TSV | cut -d ' ' -f 2)
+SP_NAME=$(echo $SP_TSV | cut -d ' ' -f 3)
 SP_PASSWORD=$(echo $SP_TSV | cut -d ' '  -f 4)
+SP_TENANT_ID=$(echo $SP_TSV | cut -d ' '  -f 5)
 
 tee -a $LOG_FILE <<EOF
-SP_TSV=$SP_TSV
-SP_APPID=$SP_APPID
+SP_DISPLAY_NAME=$SP_DISPLAY_NAME
+SP_NAME=$SP_NAME
+SP_APP_ID=$SP_APP_ID
 SP_PASSWORD=$SP_PASSWORD
+SP_TENANT_ID=$SP_TENANT_ID
 EOF
 
 # Parameters file
@@ -151,7 +156,7 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": "true"
 		},
 		"aadClientId": {
-			"value": "$SP_APPID"
+			"value": "$SP_APP_ID"
 		},
 		"aadClientSecret": {
 			"value": "$SP_PASSWORD"
@@ -168,7 +173,7 @@ EOF
 
 echo ---Deployment | tee -a $LOG_FILE
 
-az group deployment create -g $RG_NAME --template-uri https://raw.githubusercontent.com/Microsoft/openshift-origin/master/azuredeploy.json --parameters @$PARAMETERS_FILE --no-wait
+az group deployment create -g $RG_NAME --template-uri https://raw.githubusercontent.com/Microsoft/openshift-origin/release-3.9/azuredeploy.json --parameters @$PARAMETERS_FILE --no-wait
 
 # The end
 tee -a $LOG_FILE <<EOF
@@ -181,5 +186,5 @@ $ az group deployment show -n azuredeploy -g $RG_NAME --query [properties.output
 
 If you need to cleanup the whole demo, delete the resource group and the service principal:
 $ az group delete -n $RG_NAME --no-wait -y
-$ az ad app delete --id $SP_APPID
+$ az ad app delete --id $SP_APP_ID
 EOF
