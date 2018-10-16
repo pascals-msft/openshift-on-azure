@@ -14,9 +14,9 @@
 #set -e
 
 #### Edit variables here
+BASE_URL=https://raw.githubusercontent.com/Microsoft/openshift-origin/release-3.9
 DEMO_NAME=demo-openshift-$RANDOM
-LOCATION=francecentral
-# SSH_KEY_FILE=~/.ssh/demo_id_rsa
+LOCATION=westeurope
 SSH_KEY_FILE=~/.ssh/${DEMO_NAME}_rsa
 USER_NAME=openshift
 USER_PASSWORD=redhat123
@@ -41,6 +41,7 @@ PARAMETERS_FILE=azuredeploy.parameters.${DEMO_NAME}.json
 
 tee -a $LOG_FILE <<EOF
 ---Variables
+BASE_URL=$BASE_URL
 DEMO_NAME=$DEMO_NAME
 LOG_FILE=$LOG_FILE
 LOCATION=$LOCATION
@@ -78,9 +79,9 @@ SP_PASSWORD=$(echo $SP_TSV | cut -d ' '  -f 4)
 SP_TENANT_ID=$(echo $SP_TSV | cut -d ' '  -f 5)
 
 tee -a $LOG_FILE <<EOF
+SP_APP_ID=$SP_APP_ID
 SP_DISPLAY_NAME=$SP_DISPLAY_NAME
 SP_NAME=$SP_NAME
-SP_APP_ID=$SP_APP_ID
 SP_PASSWORD=$SP_PASSWORD
 SP_TENANT_ID=$SP_TENANT_ID
 EOF
@@ -99,16 +100,16 @@ cat > $PARAMETERS_FILE <<EOF
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"_artifactsLocation": {
-			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/release-3.9/"
+			"value": "${BASE_URL}"
 		},
 		"masterVmSize": {
-			"value": "Standard_DS2_v2"
+			"value": "Standard_DS3_v2"
 		},
 		"infraVmSize": {
-			"value": "Standard_DS2_v2"
+			"value": "Standard_DS3_v2"
 		},
 		"nodeVmSize": {
-			"value": "Standard_DS2_v2"
+			"value": "Standard_DS3_v2"
 		},
 		"storageKind": {
 			"value": "managed"
@@ -123,7 +124,7 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": 3
 		},
 		"nodeInstanceCount": {
-			"value": 3
+			"value": 2
 		},
 		"dataDiskSize": {
 			"value": 128
@@ -135,10 +136,10 @@ cat > $PARAMETERS_FILE <<EOF
 			"value": "$USER_PASSWORD"
 		},
 		"enableMetrics": {
-			"value": "true"
+			"value": "false"
 		},
 		"enableLogging": {
-			"value": "true"
+			"value": "false"
 		},
 		"sshPublicKey": {
 			"value": "$SSH_PUBLIC_KEY"
@@ -173,7 +174,7 @@ EOF
 
 echo ---Deployment | tee -a $LOG_FILE
 
-az group deployment create -g $RG_NAME --template-uri https://raw.githubusercontent.com/Microsoft/openshift-origin/release-3.9/azuredeploy.json --parameters @$PARAMETERS_FILE --no-wait
+az group deployment create -g $RG_NAME --template-uri ${BASE_URL}/azuredeploy.json --parameters @$PARAMETERS_FILE --no-wait
 
 # The end
 tee -a $LOG_FILE <<EOF
